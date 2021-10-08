@@ -1,0 +1,120 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://raw.githubusercontent.com/Xiaokun1999/homework_week_10/main/data/country_wise_latest.csv"
+  },
+  "vconcat": [{
+    "width": "container",
+    "height": 175,
+    "title": "Top-10 countries with COVID-19 Recovered / 100 Cases(2020)",
+    "transform": [
+      {"filter": {"param": "click"}},
+      {
+        "window": [{
+          "op": "rank",
+          "as": "rank"
+        }],
+        "sort": [{"field": "Recovered/100Cases", "order":"descending"}]
+      },
+      {"filter": "datum.rank <= 10"}
+    ],
+    "encoding": {
+      "x": {
+        "field":"Recovered/100Cases",
+        "type": "quantitative",
+        "title": "Recovered / 100 Cases"
+      },
+      "y": {
+        "field":"Country/Region",
+        "type": "nominal",
+        "sort": {"op": "average","field": "Recovered/100Cases","order":"descending"},
+        "title": null
+      }
+    },
+    "layer": [{
+      "selection": {
+        "country_highlight": {
+          "type": "multi",
+          "field": ["Country/Region"],
+          "bind": "legend"
+        }
+      },
+      "mark": "bar",
+      "encoding": {
+        "color": {
+          "field": "WHO_Region",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Africa", "Americas", "Eastern Mediterranean", "Europe", "South-East Asia", "Western Pacific"],
+            "range": ["#2ca25f", "#8856a7", "#43a2ca", "#e34a33", "#636363", "#d95f0e"]
+          }
+        },
+        "opacity": {
+          "condition": {"selection": "country_highlight", "value": 0.8},
+          "value": 0.2
+        },
+        "tooltip": [
+          {"field": "Country/Region", "type": "nominal", "title": "Country"},
+          {"field": "Confirmed", "type": "quantitative"},
+          {"field": "Recovered", "type": "quantitative"},
+          {"field": "Recovered/100Cases", "type": "quantitative", "title": "Recovered / 100 Cases"}
+        ]
+      }
+    },{
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "xOffset": -4,
+        "aria": false
+      },
+      "encoding": {
+        "text": {"field": "Recovered/100Cases", "type": "quantitative"},
+        "color": {
+          "condition": {
+            "test": {"field": "Recovered/100Cases", "gt": 1},
+            "value": "black"
+          }
+        }
+      }
+    }]
+  },{
+    "width": "container",
+    "height": 125,
+    "title": "COVID-19 Recovered / 100 Cases in Each Region(2020)",
+    "params": [{
+      "name": "click",
+      "select": {"type": "point", "encodings": ["color"]}
+    }],
+    "mark": "bar",
+    "encoding": {
+      "y": {
+        "field": "WHO_Region",
+        "type": "nominal",
+        "sort": {"op": "average", "field": "Recovered/100Cases", "order":"descending"},
+        "title": null
+      },
+      "x": {
+        "aggregate":"average",
+        "field": "Recovered/100Cases", 
+        "type": "quantitative",
+        "title": "Recovered / 100 Cases"
+      },
+      "color": {
+        "condition": {
+        "param": "click",
+        "field": "WHO_Region",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Africa", "Americas", "Eastern Mediterranean", "Europe", "South-East Asia", "Western Pacific"],
+            "range": ["#2ca25f", "#8856a7", "#43a2ca", "#e34a33", "#636363", "#d95f0e"]
+          }
+        },
+        "value": "lightgrey"
+      },
+      "tooltip":[
+        {"field": "WHO_Region", "type": "nominal", "title": "Region"},
+        {"field": "Recovered/100Cases", "type": "quantitative", "aggregate":"average","format": ".4s", "title": "Recovered / 100 Cases"}
+      ]
+    }
+  }]
+}
